@@ -5,7 +5,7 @@ author: "Art Steinmetz"
 date: "2023-07-16"
 bibliography: "references.bib"
 format: 
-   # docx: default
+   docx: default
    pdf:
       documentclass: article
       papersize: letter
@@ -28,7 +28,7 @@ runs <- 1000
 
 ## Abstract
 
-This discussion paper examines perspectives on time diversification with the goal of demonstrating that holding defensive assets in a perpetual capital portfolio, such as a college endowment, is unnecessary even with routine cash draws on the fund. This is well-researched ground, but it is worth revisiting. In this paper, we introduce two novelties. First, we look at the historical record for a much longer time period than is typical, going back to 1871 up to the present (2023), including the awful 2022 returns in both stocks and fixed income. Second, we suggest the notion of investment horizon as a declared policy parameter for defining risk acceptance by policy committees and the performance of endowment managers. We do not discuss the role of "alternatives," but simply show that typical passive benchmarks are suboptimal..
+This discussion paper examines perspectives on time diversification with the goal of demonstrating that holding defensive assets in a perpetual capital portfolio, such as a college endowment, is unnecessary even with routine cash draws on the fund. This is well-researched ground, but it is worth revisiting. In this paper, we introduce two novelties. First, we look at the historical record for a much longer time period than is typical, going back to 1871 up to the present (2023), including the awful 2022 returns in both stocks and fixed income. Second, we suggest the notion of investment horizon as a declared policy parameter for defining risk acceptance by policy committees and the performance of endowment managers. We do not discuss the role of "alternatives," but simply show that typical passive benchmarks are suboptimal.
 
 ## Introduction
 
@@ -42,7 +42,7 @@ Consider the following illustration from the ["Wall Street Journal"](https://www
 
 [^1]: Grantham Warns AI Boom Won't Prevent Market Bubble From Bursting, Wall Street Journal July 01,2023 <https://www.wsj.com/articles/grantham-warns-ai-boom-wont-prevent-market-bubble-from-bursting-fd7f5a98>
 
-An endowment's tolerance for risk should determine how much it is willing to stretch for returns beyond liquid public markets, but should no guide it to low-return investments. Alternatively, a balance between "stock return plus" and "stock return minus" assets makes sense only if the overall blended expected return does not drop below the passive benchmark. This could provide lower volatility while meeting the required return, but, again, here we argue for time diversification as better way to think about the issue.
+An endowment's tolerance for risk should determine how much it is willing to stretch for returns beyond liquid public markets, but should not guide it to low-return investments. Alternatively, a balance between "stock return plus" and "stock return minus" assets makes sense only if the overall blended expected return does not drop below the passive benchmark. This could provide lower volatility while meeting the required return, but, again, here we argue for time diversification as a better way to think about the issue.
 
 This line of thinking calls into question popular endowment asset classes like hedge funds which may be dilutive of returns. The notion that hedge funds are good because they have "less risk than long-only equities" is not a good reason to hold them since they have earned a lower return. Neither is "generating alpha" unless the endowment is willing to engage in a risk parity approach which adds a substantial amount of leverage. This is a "bridge too far" for most endowments. Absolute expected return should be the starting point to evaluate a hedge fund.
 
@@ -116,6 +116,7 @@ chart_cumret <- function(returns, years_back = 1000,log=TRUE,breaks = "3 months"
       scale_x_yearquarter(breaks = breaks, date_labels = "%Y") +
 
       scale_y_continuous(labels = scales::dollar) +
+      theme_tq() +
       labs(title = "Cumulative Return",
            x = "Date", y = "Value of $100")
    
@@ -134,7 +135,7 @@ returns_qtr |>
 
 However, as J.P. Morgan blithely noted, "Markets will fluctuate." We are more interested in how an endowment might weather the storms over shorter periods. How much courage will the managers need to face them?
 
-2022 was a terrible year for stocks but how does the last decade look? The opportunity cost of holding defensive assets was huge. Consider the arrival of COVID. It panicked many retail investors into selling but it was a small blip on the radar even on a short horizon. The onset of Fed tightening was widely telegraphed and quite consequential for stocks, but also for bonds, which provided not much shelter. Still, an 18-month horizon, from the middle of 2021 to the end of 2022, was sufficent to make an investor indifferent among all the assets shown below, including cash.
+2022 was a terrible year for stocks but how does the last decade look? The opportunity cost of holding defensive assets was huge. Consider the arrival of COVID. It panicked many retail investors into selling but it was a small blip on the radar even on a short horizon. The onset of Fed tightening was widely telegraphed and quite consequential for stocks, but also for bonds, which provided not much shelter. Still, an 18-month horizon, from the middle of 2021 to the end of 2022, was sufficient to make an investor indifferent among all the assets shown below, including cash.
 
 ```{r chart cumulative return}
 returns_qtr |>
@@ -177,6 +178,7 @@ chart_rolling_performance <-
          scale_color_tq() + 
          scale_x_yearquarter(breaks = "25 years", date_labels = "%Y") +
          scale_y_continuous(labels = scales::percent) + 
+         theme_tq() +
          labs(title = title,x="Date",y="Annualized Return")
       
       
@@ -242,7 +244,7 @@ Nevertheless, the stock-only portfolio outperformed the 70/30 benchmark `r win_p
 
 One says to the other, "I beat my 70/30 benchmark 65% of the time." The other says "I beat my 70/30 benchmark 95% of the time." Then they compare holdings over time. They are identical. How can this be?
 
-For an asset that trends upwards, we can be more certain of a positive outcome on a longer horzion. On a shorter horizon, there will be more negative return periods. Upon reflection, this is obvious but it can color our thinking about risk. When we casually speak of market "volatility" we often mean "loss." Nobody complains about upside risk. In that framework, diversification usually means adding assets to blunt potential loss. Alternatively, we can think about risk as a consequence of time, rather than just drawdown, where time itself is a risk mitigant. If you accept *as a given* that public stock markets always recoup losses eventually, then time is the variable that should define risk tolerance within any given portfolio. The literature on time diversification is extensive and uncontroversial so it is paradoxical that "defensive" assets continue to be held in endowments with essentially perpetual horizons. [@timediv1995] The fact that continual cash drawdowns are required does not change this. Suppose the average endowment draws 5% of the principal annually. That implies a horizon of 20 years, making the likelihood that defensive assets enhance the wealth of the endowment very small.
+For an asset that trends upwards, we can be more certain of a positive outcome on a longer horizon. On a shorter horizon, there will be more negative return periods. Upon reflection, this is obvious but it can color our thinking about risk. When we casually speak of market "volatility" we often mean "loss." Nobody complains about upside risk. In that framework, diversification usually means adding assets to blunt potential loss. Alternatively, we can think about risk as a consequence of time, rather than just drawdown, where time itself is a risk mitigant. If you accept *as a given* that public stock markets always recoup losses eventually, then time is the variable that should define risk tolerance within any given portfolio. The literature on time diversification is extensive and uncontroversial so it is paradoxical that "defensive" assets continue to be held in endowments with essentially perpetual horizons. [@timediv1995] The fact that continual cash drawdowns are required does not change this. Suppose the average endowment draws 5% of the principal annually. That implies a horizon of 20 years, making the likelihood that defensive assets enhance the wealth of the endowment very small.
 
 To examine the consequences of different horizons we will compare the annualized return differences across multiple horizons among pairs of portfolios, stocks, bonds, the 70/30 benchmark and cash. Below we show one pair, stocks vs. the 70/30 benchmark, for and three-year and ten-year horizons. Note the increased frequency of underperformance of pure stocks for the three-year horizon with a larger magnitude of deviation. We are interested in measuring the average excess return for stocks and the fraction of time stocks are the better investment for the multiple horizons to understand how we perceive performance.
 
@@ -262,6 +264,7 @@ relative_return |>
    scale_color_tq() +
    scale_x_yearquarter(breaks = "20 years", date_labels = "%Y") +
    scale_y_continuous(labels = scales::percent) + 
+   theme_tq() +
    labs(title="Same Portfolio, Different Perspectives",
         subtitle = "100% Stocks vs. a 70/30 Benchmark over Different Measurement Horizons",
         y = "Outperformance of 100% Stocks (Annualized)")
@@ -275,6 +278,7 @@ relative_return |>
     scale_color_tq() + 
     geom_hline(yintercept = 0) +
     scale_y_continuous(labels = scales::percent,breaks = (0:7)/100) + 
+   theme_minimal() +
     labs(title = "Average Outperformance Quickly\nConverges to Long-Term Outperformance",
          y = "Average Outperformance",
          x = "Measurement Horizon")
@@ -289,7 +293,7 @@ relative_return |>
    ggplot(aes(horizon, series1_better_pct / 100, color = comparison)) + geom_line(linewidth = 1) +
    scale_color_tq() +
    scale_y_continuous(labels = scales::percent) +
-   
+   theme_minimal()  +
    labs(title = "A Longer Horizon Means More Certain Outperformance",
         subtitle = "(Except for Bonds)",
         y = "Percentage of Outperformance Periods",
@@ -298,7 +302,7 @@ relative_return |>
 
 ## A Monte Carlo Approach
 
-So far we have been making observations about the past. Now lets imagine the future. Consider an endowment which starts with \$100mm. A new endowment manager is hired with a 10-year contract (not realistic) and gets measured after 10 years with the goal of maximizing the size of the endowment. We test terminal endowment wealth under two cash-flow scenarios.
+So far we have been making observations about the past. Now let's imagine the future. Consider an endowment which starts with \$100mm. A new endowment manager is hired with a 10-year contract (not realistic) and gets measured after 10 years with the goal of maximizing the size of the endowment. We test terminal endowment wealth under two cash-flow scenarios.
 
 1.  Level pay adjusted for inflation. The endowment starts out paying \$5mm and receiving contributions of \$1mm once a year for a net of \$4mm. This amount grows with inflation but is otherwise fixed, on the notion the college spends the same every year, irrespective of market gyrations.
 
@@ -473,7 +477,7 @@ If we look at the characteristics of the return distribution we sampled from, we
 
 More importantly, though, is the simple truth that, if the expected return of a portfolio is less than the required drawdown of cash from the endowment, the portfolio is unsustainable. You may observe that, in an efficient frontier context, it is possible to add a low return asset and get a better risk-reward ratio. Unfortunately, the optimal portfolio blend will have a return below the all-stock portfolio and possibly below the required return. Yes, leverage can be used to increase the return to an arbitrary level. This is Asness' point but, again, few endowments would accept so much borrowing. A "risk parity" portfolio with a 70/30 base would require about 40% leverage, assuming historical returns and borrowing at the risk-free rate (see appendix). Of course, many hedge funds play exactly this game. Whether they succeed is a separate question.
 
-We have shown that a passive benchmark containing "defensive" assets derives from placing to much emphasis on short-term loss potential. Taking a longer measurement horizon can allay those fears. Adding diversifying assets that put a drag on return and lower the expected future wealth of the endowment should be avoided. Especially problematic are those which have an expected return at or below the rate of cash draw, such as Treasury debt. There is certainly merit to diversifying an investment portfolio provided the alternative assets add to the expected return. If less liquid, high expected return assets are used to enhance the portfolio then two questions for endowment managers to ask are:
+We have shown that a passive benchmark containing "defensive" assets derives from placing too much emphasis on short-term loss potential. Taking a longer measurement horizon can allay those fears. Adding diversifying assets that put a drag on return and lower the expected future wealth of the endowment should be avoided. Especially problematic are those which have an expected return at or below the rate of cash draw, such as Treasury debt. There is certainly merit to diversifying an investment portfolio provided the alternative assets add to the expected return. If less liquid, high expected return assets are used to enhance the portfolio then two questions for endowment managers to ask are:
 
 1.  How much risk do return-enhancing investments add - at the portfolio level , taking correlation into account?
 
@@ -530,6 +534,7 @@ returns_qtr |>
    ggplot(aes(stock_ret,color=Period)) + geom_density(linewidth = 1) + 
    scale_color_tq() + 
    scale_x_continuous(labels = scales::percent) + 
+   theme_tq() +
    labs(title = "More Frequent Stock Losses before 1946",
         subtitle = "1871-2023",
         y="Relative Frequency of Return\n(Distribution Density)",
@@ -546,6 +551,7 @@ returns_qtr |>
    ggplot(aes(stock_ret,color=Period)) + geom_density(linewidth = 1) + 
    scale_color_tq() + 
    scale_x_continuous(labels = scales::percent) + 
+   theme_tq() +
    labs(title = "More Frequent Stock Losses before 1946",
         subtitle = "1871-2023 (1929-1933 Excluded)",
         y="Relative Frequency of Return\n(Distribution Density)",
