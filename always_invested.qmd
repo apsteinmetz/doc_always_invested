@@ -5,7 +5,7 @@ author: "Art Steinmetz"
 date: "2023-07-16"
 bibliography: "references.bib"
 format: 
-   docx: default
+   # docx: default
    pdf:
       documentclass: article
       papersize: letter
