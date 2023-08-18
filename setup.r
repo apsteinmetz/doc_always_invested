@@ -40,12 +40,12 @@ tidy_to_xts <- function(df){
 }
 
 
-rolling_ret <- function(returns, years = 10) {
+rolling_ret <- function(returns, years = 10,pds_per_year = 4) {
    returns |>
       mutate(across(where(is.numeric),
                     function(x)
                        (slide_prod(1 + x,
-                                   before = years * 4 - 1,
+                                   before = years * pds_per_year - 1,
                                    complete = TRUE) ^ (1 / 10)
                        ) - 1)) |>
       na.omit()
