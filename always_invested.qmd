@@ -1,8 +1,8 @@
 ---
 title: "Simulating Alternative Endowment Benchmarks with 150 years of history."
 subtitle: "100% Equities...again? A Discussion Paper."
-author: "Art Steinmetz"
-date: "2023-07-16"
+author: "Arthur Steinmetz"
+date: "2023-08-18"
 bibliography: "references.bib"
 format: 
    # docx: default
@@ -28,23 +28,27 @@ runs <- 1000
 
 ## Abstract
 
-This discussion paper examines perspectives on time diversification with the goal of demonstrating that holding defensive assets in a perpetual capital portfolio, such as a college endowment, is unnecessary even with routine cash draws on the fund. This is well-researched ground, but it is worth revisiting. In this paper, we introduce two novelties. First, we look at the historical record for a much longer time period than is typical, going back to 1871 up to the present (2023), including the awful 2022 returns in both stocks and fixed income. Second, we suggest the notion of investment horizon as a declared policy parameter for defining risk acceptance by policy committees and the performance of endowment managers. We do not discuss the role of "alternatives," but simply show that typical passive benchmarks are suboptimal.
+This discussion paper examines perspectives on time diversification with the goal of demonstrating that holding defensive assets in a perpetual capital portfolio, such as a college endowment, is unnecessary even with routine cash draws on the fund. This is well-researched ground, but it is worth revisiting. In this paper, we introduce two novelties. First, we look at the historical record for a much longer time period than is typical, going back to 1871 up to the present (2023), including the awful 2022 returns in both stocks and fixed income. Second, we suggest the notion of investment horizon as a declared policy parameter for defining risk acceptance by policy committees and the performance of endowment managers. We do not discuss the role of "alternatives," but simply show that typical passive benchmarks are sub optimal. We are not arguing for a passive all-equity portfolio. We are arguing for a 100% equity policy benchmark.[^1]
+
+[^1]: The author is grateful to Anders Hall of Vanderbilt University and Krishna Memani of Lafayette College for their comments on a draft of this paper. All opinions and errors are the author's alone.
 
 ## Introduction
 
+A typical college endowment uses a passive or "policy" benchmark as an anchor for thinking about risk. This is usually composed of some fraction of liquid U.S. equities and liquid U.S. fixed income. At a minimum, the trustees expect the endowment manager to exceed the return of the policy benchmark. This is done by investing in asset classes that are expected to outperform one or more of the components of the policy benchmark. With higher expected return often comes lower liquidity. Most of the time this is not a problem since an endowment is a perpetuity. Still, the college draws on the endowment annually to support itself so a reserve of liquidity is needed. Investment managers think about liquid fixed income as a safer asset than public equities, and it is, but is it needed for liquidity purposes? Risk is commonly thought of as risk of loss. Often unstated in such discussions is the notion of an investment horizon. As it turns out, how we think about horizon has a profound effect on how we think about risk. The policy benchmark, which anchors investment decisions, needs a reevaluation.
+
 Way back in 1994, Thaler and Williamson [@thaler1994] asked "why not 100% equities?" for an endowment portfolio. The main point being that asset diversification is unimportant when the investor time horizon is sufficiently long, perpetual in the case of a college endowment. Cliff Asness [@asness1996] critiqued this view in 1996, pointing out that the decision of which risky assets to hold and how much risk to bear are two separate decisions. Asness demonstrated that, while 100% equities beats the traditional 60/40 portfolio in absolute return over time, this allocation is far from optimal. Asness argues that simply buying the broad stock market is sub-optimal. It can be outperformed by adding diversifying asset classes *that themselves outperform*. Further, constructing a levered 60/40 portfolio will outperform a 100% stock portfolio in absolute terms while delivering lower volatility (see Appendix). In fairness to Thaler and Williamson, they don't argue FOR the broad market as the sole asset class as much as they argue AGAINST a large defensive position to mitigate volatility for perpetual-life endowments. Asness asks us to consider what "large" means. Also, Thaler, *et.al*. would certainly not argue against diversification of assets that enhance returns, like private equity, just against assets that are dilutive of returns, like cash, for no good purpose. Now, nearly 30 years later it is worth asking the question again, "Why not 100% equities?"
 
-Discussions of the appropriate level of risk are often framed in terms of meeting the cash needs of an endowment sponsor during periods of steep bear markets. Certainly, there need to be enough liquid assets to meet those needs, but public equities can meet those needs. In that circumstance, there may be some aversion to the notion of being forced to sell stocks in a down market. I argue that this should not be a concern. Selling "low" feels wrong because it is a "dead weight" loss that cannot be recovered. However, this ignores the opportunity cost of not being invested in stocks in the previous period, however long you want to define the period. This is a behavioral finance problem, not an investment problem. Certainly, needed liquidity must be provided for with liquid assets. Public stock markets do this while creating more total wealth despite adverse periods.
+Discussions of the appropriate level of risk are often framed in terms of meeting the cash needs of an endowment sponsor during periods of steep bear markets. Certainly, there need to be enough liquid assets to meet those needs, but public equities can meet those needs. In that circumstance, there may be some aversion to the notion of being forced to sell stocks in a down market. I argue that this should not be a concern. Selling "low" feels wrong because it is a "dead weight" loss that cannot be recovered. However, this ignores the opportunity cost of not being invested in stocks in the previous period, however long you want to define the period. This is a behavioral finance problem, not an investment problem. Certainly, needed liquidity must be provided for with liquid assets. Public stock markets do this while creating more total wealth despite adverse periods. Unless you are very, very good at market timing, holding "dry powder" is a waste.
 
 This fear is analogous to the fallacy of "dollar-cost averaging," where a small investor is concerned about the market declining right after their money is put to work. They are often advised to invest a portion over time. This eases the "pain of regret," which we know is a greater motivator than the pleasure of gain, even though it will likely leave the investor with less wealth over time. [@hayley2012]
 
-Consider the following illustration from the ["Wall Street Journal"](https://www.wsj.com/articles/grantham-warns-ai-boom-wont-prevent-market-bubble-from-bursting-fd7f5a98)[^1]. Jeremy Grantham of GMO, a respected investor, has been warning of a stock market selloff since 2015 when the S&P 500 was around 2,000. He's been right twice in the intervening years, yet the S&P 500 is over 4,400 today, eight years later. He may be right again. Was keeping "dry powder" appropriate for a long-term investor? Ben Iker, GMO's co-head of asset allocation, walks back his boss' warnings: "There is this weird problem with the investment industry: Most of the reasons why people invest are long-term in nature. Retirement, pension plans, university endowments---they have very long-term goals. Yet, so many investment decisions are made in the short term."
+Consider the following illustration from the ["Wall Street Journal"](https://www.wsj.com/articles/grantham-warns-ai-boom-wont-prevent-market-bubble-from-bursting-fd7f5a98)[^2]. Jeremy Grantham of GMO, a respected investor, has been warning of a stock market selloff since 2015 when the S&P 500 was around 2,000. He's been right twice in the intervening years, yet the S&P 500 is over 4,400 today, eight years later. He may be right again. Was keeping "dry powder" appropriate for a long-term investor? No. Ben Iker, GMO's co-head of asset allocation, walks back his boss' warnings: "There is this weird problem with the investment industry: Most of the reasons why people invest are long-term in nature. Retirement, pension plans, university endowments---they have very long-term goals. Yet, so many investment decisions are made in the short term."
 
-[^1]: Grantham Warns AI Boom Won't Prevent Market Bubble From Bursting, Wall Street Journal July 01,2023 <https://www.wsj.com/articles/grantham-warns-ai-boom-wont-prevent-market-bubble-from-bursting-fd7f5a98>
+[^2]: Grantham Warns AI Boom Won't Prevent Market Bubble From Bursting, Wall Street Journal July 01,2023 <https://www.wsj.com/articles/grantham-warns-ai-boom-wont-prevent-market-bubble-from-bursting-fd7f5a98>
 
 An endowment's tolerance for risk should determine how much it is willing to stretch for returns beyond liquid public markets, but should not guide it to low-return investments. Alternatively, a balance between "stock return plus" and "stock return minus" assets makes sense only if the overall blended expected return does not drop below the passive benchmark. This could provide lower volatility while meeting the required return, but, again, here we argue for time diversification as a better way to think about the issue.
 
-This line of thinking calls into question popular endowment asset classes like hedge funds which may be dilutive of returns. The notion that hedge funds are good because they have "less risk than long-only equities" is not a good reason to hold them since they have earned a lower return. Neither is "generating alpha" unless the endowment is willing to engage in a risk parity approach which adds a substantial amount of leverage. This is a "bridge too far" for most endowments. Absolute expected return should be the starting point to evaluate a hedge fund.
+This line of thinking calls into question popular endowment asset classes like hedge funds which may be dilutive of returns. The notion that hedge funds are good because they have "less risk than long-only equities" is not a good reason to hold them since they have earned a lower return. Neither is "generating alpha" unless the endowment is willing to engage in a risk parity approach which adds a substantial amount of leverage. This is on top of the leverage most hedge funds utilize internally. It is a "bridge too far" for most endowments. Absolute expected return should be the starting point to evaluate a hedge fund.
 
 ## How Does a "Fully Invested" Portfolio Compare?
 
@@ -54,11 +58,11 @@ It is not controversial to say that, over the long run, stocks have outperformed
 
 2.  70/30% U.S. stocks and 10-year Treasury Bonds.
 
-We choose a "70/30" portfolio as more representative of a typical endowment benchmark than the "60/40" often recommended for retail investors.[^2] The data we use is from Robert Shiller at Yale, who has built very long time series of stock, bond, and cash returns[^3] going back to 1871 to support his work on cyclically-adjusted P/E ratios. This very long history includes more periods of adverse stock returns, such as the 1929 crash, than most analyses, so is more conservative in supporting a "defensive" allocation.
+We choose a "70/30" portfolio as more representative of a typical endowment benchmark than the "60/40" often recommended for retail investors.[^3] The data we use is from Robert Shiller at Yale, who has built very long time series of stock, bond, and cash returns[^4] going back to 1871 to support his work on cyclically-adjusted P/E ratios. This very long history includes more periods of adverse stock returns, such as the 1929 crash, than most analyses, so is more conservative in supporting a "defensive" allocation.
 
-[^2]: In the NACUBO survey of large endowment funds, the effective equity exposure, for the 11 years ending in 2019, was 72%. <https://richardmennis.com/blog/endowment-performance> (2020)
+[^3]: In the NACUBO survey of large endowment funds, the effective equity exposure, for the 11 years ending in 2019, was 72%. <https://richardmennis.com/blog/endowment-performance> (2020)
 
-[^3]: <http://www.econ.yale.edu/~shiller/data.htm>
+[^4]: <http://www.econ.yale.edu/~shiller/data.htm>
 
 We will compare these two portfolios over the full history, a rolling 10-year history and the most adverse period for stocks around the crash of 1929. Then we will use a Monte-Carlo approach to sample many possible 10-year outcomes, including hypothetical endowment cash draw of both a fixed amount and fixed percentage of the endowment balance.
 
@@ -270,7 +274,7 @@ relative_return |>
         y = "Outperformance of 100% Stocks (Annualized)")
 ```
 
-Below we can see that average outperformance converges to the long horizon result after about three years, so horizon doesn't have a big effect on AVERAGE return differences among these portfolios. Over the long term, being measured on 3-year performance or 10-year shouldn't make much difference IF there are sufficiently many performance measurement snapshots. Over the career of an endowment manager there may not be enough snapshots to show this.
+Below we can see that average outperformance converges to the long horizon result after about three years, so horizon doesn't have a big effect on AVERAGE return differences among these portfolios. Over the long term, being measured on 3-year performance or 10-year shouldn't make much difference IF there are sufficiently many performance measurement snapshots. Over the career of an endowment manager there may not be enough snapshots to show this so it is up to the investment committee to understand it.
 
 ```{r plot return different horizons}
 relative_return |> 
@@ -485,11 +489,17 @@ We have shown that a passive benchmark containing "defensive" assets derives fro
 
 The answer to the question of how much to hold in "defensive" assets is the same as it was thirty years ago, zero.
 
+::: {.callout-note appearance="minimal"}
+The author is the former CEO of OppenheimerFunds and a member of the Denison University Investment Committee. He can be reached at apsteinmetz\@gmail.com.
+
+
+This document is a Quarto notebook using the R data science language. Code and data available at [https://github.com/apsteinmetz/doc_always_invested.git](https://github.com/apsteinmetz/doc_always_invested.git). Quarto is available from [Posit.co](posit.co)
+:::
 ## Appendix
 
 ### A Risk Parity Portfolio
 
-Below we see the efficient frontier using the entire history for various mixes of stocks and bonds. Given cash returns the "optimal" portfolio would have been a mix of about 40% stocks, 60% bonds. A risk parity portfolio to match even the volatility of a 70/30 portfolio would require an enormous amount of leverage. This is due to the sad fact that 10-year T-Notes have scarcely returned above short term T-Bills over the full history.
+Below we see the efficient frontier using the entire history for various mixes of stocks and bonds. Given cash returns, the "optimal" portfolio would have been a mix of about 40% stocks, 60% bonds. A risk parity portfolio to match even the volatility of a 70/30 portfolio would require an enormous amount of leverage. This is due to the sad fact that 10-year T-Notes have scarcely returned above short term T-Bills over the full history.
 
 ```{r compute capital market line}
 get_risk_return <- function(stock_alloc,returns,pds=4){
