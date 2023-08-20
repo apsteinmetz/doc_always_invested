@@ -1,3 +1,5 @@
+library(tidyverse)
+source("setup.r")
 constant_draw = TRUE
 annl_draw = -.04
 years=10
@@ -35,6 +37,7 @@ zt <- cbind(z,cash_flow)|>
       select(contains("balance"))
 
 
+# plot in the style of Grant's Interest Rate Observer
 bind_cols(z[,1],zt) |>
    ggplot(aes(date,stock_balance)) +
    geom_line() +
@@ -43,14 +46,14 @@ bind_cols(z[,1],zt) |>
    annotate("text",family = "serif",label = "Starting Value: $100mm",
             x=as.yearqtr("1975 Q1","%Y Q%q"), y= 102) +
    labs(title= "How Patient Are You?",
+        subtitle = "$100mm Starting Endowment Value. Assume Fixed Annual Spend
+        Starting at $5mm, Growing With Inflation.",
         y = "Endowment Balance ($mm)",
         x= "Date",
         caption="Source: Equity Returns - Robert Shiller; Simulation - Art Steinmetz") +
    theme_light(base_family = "serif",base_size = 16) +
-   annotate("text",x=as.yearqtr("1973 Q1","%Y Q%q"),y=140,
-            family = "serif",size = 5, hjust = 0,
-            label = "$100mm Starting Endowment Value. Assume Fixed Annual Spend,
-            Starting at $5mm, Growing With Inflation.") +
+   theme(plot.subtitle = element_text(vjust=-15,hjust=.1),
+         plot.title = element_text(vjust=-10)) +
    annotate("text",x=3100,y=65, family = "serif",size = 5,
             label = "100% U.S. Equities") +
    annotate("text",x=3100,y=95, family = "serif",size = 5,
