@@ -1,14 +1,12 @@
 ---
-title: "Simulating Alternative Endowment Benchmarks with 150 years of history."
+title: "Simulating Alternative Endowment Benchmarks with 220 years of history."
 subtitle: "100% Equities...again? A Discussion Paper."
 author: "Arthur Steinmetz"
-date: "2023-08-18"
+date: "2024-01-02"
 bibliography: "references.bib"
 format: 
    pdf:
-      documentclass: article
-      papersize: letter
-     
+      toc: true
 execute:
    eval: true
    echo: false
@@ -18,11 +16,48 @@ execute:
 
 ```{r setup}
 # load libraries, data and functions to manipulate returns
+# use annual returns from McQuarrie, 1793-1925
+# assume cash yield before 1870 equals mean of cash yield over 1926-2022
 source("setup.r")
-# not correct
-# returns_qtr <- returns_qtr |> 
-#   mutate(across(where(is.numeric),\(x) log(1+x)))
+
 runs <- 1000
+
+mcquarrie_new_series_1793_to_1925 <- read_table("data/mcquarrie_new_series_1793_to_1925.csv") |>
+   # convert character percentages to numeric
+   mutate(across(where(is.character), ~parse_number(.x)/100))
+
+# convert quarterly data to annual
+returns_annl <- returns |>
+   mutate(bm_ret = 0.7*stock_ret + 0.3*bond_ret,) |>
+   # 12-month change, monthly
+   mutate(cpi_annl = CPI/lag(CPI)-1) |>
+   mutate(year = year(date)) |>
+   select(year,date,cash_ret,stock_ret,bond_ret,cpi_annl) |>
+   group_by(year) |>
+   summarise(across(where(is.numeric),~ prod(1+.x)-1)) |>
+   rename(date = year)
+
+returns_annl <- returns_annl |>
+   filter(date > max(mcquarrie_new_series_1793_to_1925$date)) |>
+   select(-cash_ret) |>
+   full_join(mcquarrie_new_series_1793_to_1925) |>
+   arrange(date) |>
+   full_join(select(returns_annl,date,cash_ret)) |>
+   mutate(cpi_growth = cumprod(1+cpi_annl)) |>
+   mutate(bm_ret = 0.7*stock_ret + 0.3*bond_ret,) |>
+   # convert NA cash_ret to mean of non-NA cash_ret
+   mutate(cash_ret = replace_na(cash_ret,mean(cash_ret,na.rm = TRUE))) |>
+   mutate(date = as.Date(paste0(date,"-12-31")))
+
+# plot cpi_annl
+# returns_annl |>
+#    ggplot(aes(date, cpi_annl)) + geom_line() +
+#    scale_color_tq() +
+#    scale_y_continuous(labels = scales::percent) +
+#    theme_tq() +
+#    labs(title = "Annual CPI Growth",
+#         x = "Date", y = "Annual CPI Growth")
+
 ```
 
 ## Abstract
@@ -31,7 +66,7 @@ This discussion paper examines perspectives on time diversification with the goa
 
 [^1]: The author is grateful to Anders Hall of Vanderbilt University and Krishna Memani of Lafayette College for their comments on a draft of this paper. All opinions and errors are the author's alone.
 
-## Introduction
+This version of the paper uses the extended historical return record dataset developed by McQuarrie[@doi:10.1080/0015198X.2023.2268556]. This dataset shows worse relative returns for stocks in th 19th century than the more commonly used Shiller dataset. In an earlier version of this paper using 10-year returns going back to 1880, an all-stock portfolio outperforms a benchmark of 70% stocks/30% bonds 81% of the time. Using a history going back to 1802, stocks outperform a 70/30 portfolio only 64% of the time. Is the 19th century representative of the return distribution we expect going forward? That question is unanswered.
 
 A typical college endowment uses a passive or "policy" benchmark as an anchor for thinking about risk. This is usually composed of some fraction of liquid U.S. equities and liquid U.S. fixed income. At a minimum, the trustees expect the endowment manager to exceed the return of the policy benchmark. This is done by investing in asset classes that are expected to outperform one or more of the components of the policy benchmark. With higher expected return often comes lower liquidity. Most of the time this is not a problem since an endowment is a perpetuity. Still, the college draws on the endowment annually to support itself so a reserve of liquidity is needed. Investment managers think about liquid fixed income as a safer asset than public equities, and it is, but is it needed for liquidity purposes? Risk is commonly thought of as risk of loss. Often unstated in such discussions is the notion of an investment horizon. As it turns out, how we think about horizon has a profound effect on how we think about risk. The policy benchmark, which anchors investment decisions, needs a reevaluation.
 
@@ -71,22 +106,22 @@ We will compare these two portfolios over the full history, a rolling 10-year hi
 2.  Quarterly rebalancing of the 70/30 portfolio.
 
 ::: callout-note
-In the charts that follow "stock_ret" is the broad U.S. stock market, "bond_ret" is the 10-year Treasury, "bm_ret" is the 70/30 benchmark, blending stocks and 10-year Treasury notes, and "cash" is the 1-year Treasury sampled annually until 1934, when it switches to 3-month T-Bills sampled quarterly. This is how the Shiller data set is constructed.
+In the charts that follow "stock_ret" is the broad U.S. stock market, "bond_ret" is the 10-year Treasury, "bm_ret" is the 70/30 benchmark, blending stocks and 10-year Treasury notes, and "cash" is the 1-year Treasury sampled annually until 1934, when it switches to 3-month T-Bills sampled quarterly. No cash returns are available before 1871 so the post-1871 average is used before that.
 :::
 
 ```{r look at return structure}
-ret_struct <- returns_qtr |> 
+ret_struct <- returns_annl |> 
    # subset time?
    # filter(as.Date(date) > Sys.Date()-365*20) |> 
    get_return_struct()
 
-temp <- tibble(Statistic = c("Avg. Annl. Return","Volatility"), bind_rows(round(100*((1 + ret_struct$means)^4-1),2),
-         round(100*(ret_struct$std_dev)*2,2)))
+temp <- tibble(Statistic = c("Avg. Annl. Return","Volatility"), bind_rows(round(100*ret_struct$means,2),
+         round(100*(ret_struct$std_dev),2)))
 
 temp |> gt() |>
    tab_header(
     title = "Summary Statistics",
-    subtitle = glue::glue("{min(returns_qtr$date)} to {max(returns_qtr$date)}"))
+    subtitle = glue::glue("{min(returns_annl$date)} to {max(returns_annl$date)}"))
 
 
 round(ret_struct$cor,2) |> 
@@ -94,7 +129,7 @@ round(ret_struct$cor,2) |>
    gt() |>
    tab_header(
     title = "Correlation Matrix",
-    subtitle = glue::glue("{min(returns_qtr$date)} to {max(returns_qtr$date)}"))
+    subtitle = glue::glue("{min(returns_annl$date)} to {max(returns_annl$date)}"))
 
 ```
 
@@ -103,9 +138,8 @@ Looking at the full history, there are no surprises. An all stock portfolio wins
 ```{r mountain chart 1}
 
 chart_cumret <- function(returns, years_back = 1000,log=TRUE,breaks = "3 months") {
-   returns <- returns |> filter(as.Date(date) > Sys.Date() - years_back * 365)
    gg <- returns |>
-      filter(as.Date(date) > Sys.Date() - years_back * 365) |>
+      filter(as.Date(date) > Sys.Date() - (years_back * 365)) |>
       mutate(across(where(is.numeric), function(x) cumprod(1 + x) * 100)) |>
       na.omit() |>
       pivot_longer( cols = where(is.numeric), 
@@ -116,7 +150,7 @@ chart_cumret <- function(returns, years_back = 1000,log=TRUE,breaks = "3 months"
       ggplot(aes(date, return, color = asset)) + geom_line(linewidth = 1) +
       geom_hline(yintercept = 0) +
       scale_color_tq() +
-      scale_x_yearquarter(breaks = breaks, date_labels = "%Y") +
+      # scale_x_yearquarter(breaks = breaks, date_labels = "%Y") +
 
       scale_y_continuous(labels = scales::dollar) +
       theme_tq() +
@@ -130,7 +164,7 @@ chart_cumret <- function(returns, years_back = 1000,log=TRUE,breaks = "3 months"
    gg
    
 }
-returns_qtr |>
+returns_annl |>
    select(date, cash_ret, bm_ret, stock_ret) |>
    chart_cumret(breaks = "20 years")
 
@@ -141,7 +175,7 @@ However, as J.P. Morgan blithely noted, "Markets will fluctuate." We are more in
 2022 was a terrible year for stocks but how does the last decade look? The opportunity cost of holding defensive assets was huge. Consider the arrival of COVID. It panicked many retail investors into selling but it was a small blip on the radar even on a short horizon. The onset of Fed tightening was widely telegraphed and quite consequential for stocks, but also for bonds, which provided not much shelter. Still, an 18-month horizon, from the middle of 2021 to the end of 2022, was sufficient to make an investor indifferent among all the assets shown below, including cash.
 
 ```{r chart cumulative return}
-returns_qtr |>
+returns_annl |>
    select(date, cash_ret, bm_ret, stock_ret) |>
    chart_cumret(years_back = 10,log=FALSE,breaks = "1 year")
 
@@ -151,7 +185,7 @@ Let us now turn to a seemingly more adverse environment that still captures our 
 
 ```{r chart return around crash of 29}
 bracket = 6 #years plus or minus
-returns_qtr |>
+returns_annl |>
    select(date, cash_ret, bm_ret, stock_ret) |>
    filter(as.Date(date) > as.Date("1930-01-01") - bracket * 365) |>
    filter(as.Date(date) < as.Date("1930-01-01") + bracket * 365) |>
@@ -161,14 +195,14 @@ returns_qtr |>
 
 In a world of perfect foresight, cash would have been the best choice in the moment. However, over an appropriately long horizon, were defensive assets warranted around the crash? No. Would the trustees of an endowment have been able to provide the necessary political capital to avoid firing the managers? Maybe not. But trustees who spent the decade from 1925 to 1935 in a deep sleep, like Rip Van Winkle, would have been perfectly satisfied with the results of the portfolio.
 
-There have certainly been 10-year windows when a fully invested portfolio was not the best choice. How often and how long do they last? The chart below gives you a sense of the range of actual historical rolling 10-year returns for each portfolio. We can make a few observations. It is rare, but more often than not, for stocks to have a negative return for a 10-year horizon. There has never been a negative 10-year stretch for the blended benchmark. As an aside, the trailing 10-year return for bonds in 2022 Q3 was the worst in our history, but still slightly positive.
+There have certainly been 10-year windows when a fully invested portfolio was not the best choice. How often and how long do they last? The chart below gives you a sense of the range of actual historical rolling 10-year returns for each portfolio. We can make a few observations. It is rare, but more often than not, for stocks to have a negative return for a 10-year horizon. The only time when both both bonds and stocks had a negative 10-year return was in the aftermath of the failure of the Second Bank of the United States in 1841. As an aside, the trailing 10-year return for bonds in 2022 Q3 was the worst since 1842 but still slightly positive.
 
 ```{r rolling performance chart}
 chart_rolling_performance <-
    function(returns,
             years = 10,
             title = "Rolling 10-Year Return",
-            pds_per_year = 4) {
+            pds_per_year = 1) {
       returns |>
          mutate(across(where(is.numeric),
                        function(x) 
@@ -186,20 +220,20 @@ chart_rolling_performance <-
       
       
 }
-returns_qtr |> 
+returns_annl |> 
    select(date,cash_ret,bm_ret,stock_ret,bond_ret) |> 
    rename(Y10_bondret= bond_ret) |> 
    chart_rolling_performance(years = 10)
 ```
 
-In essence, there have been three periods where a stocks-only portfolio materially underperformed a 70/30 portfolio on a 10-year basis: during the Great Depression, the Great Recession, and the worst episode, the policy-induced recession of 1937-1938. In the first two instances, the rolling return soon favored the all-stock portfolio again, even against cash.
+In essence, there have been four periods where a stocks-only portfolio materially underperformed a 70/30 portfolio on a 10-year basis: during the Civil War, during the Great Depression, the Great Recession, and the worst episode, the policy-induced recession of 1937-1938. In the first two instances, the rolling return soon favored the all-stock portfolio again, even against cash.
 
 In the last instance, it took five years before a manager could say that omitting a defensive component was the better choice for the prior ten years. It is now widely agreed that the ["recession within the depression"](https://www.federalreservehistory.org/essays/recession-of-1937-38) [@Waiwood] was caused by an unfortunate confluence of three policy changes; the Fed tightened policy to sop up "excess" bank reserves despite shaky growth, the Treasury decided to sterilize the gold inflows Europe was sending to buy arms and the Social Security payroll tax was commenced [@bordo2012]. Hopefully, policy makers have learned some lessons from that episode.
 
 A more sobering view considers the cumulative value of a portfolio over a rolling 10-year window. The range of outcomes has been quite large.
 
 ```{r show rolling 10-year results}
-cum_values <- get_rolling_cum(returns_qtr,years=10,base_value = 100)
+cum_values <- get_rolling_cum(returns_annl,years=10,base_value = 100)
 
 cr <- cum_values |> select(contains("ret"))
 
@@ -254,7 +288,7 @@ To examine the consequences of different horizons we will compare the annualized
 ```{r chart relative rolling performance}
 
 relative_return <- c(1:20) |> map_dfr(\(horizon)
-                                 rel_perf(returns_qtr,horizon))
+                                 rel_perf(returns_annl,horizon))
 
 compare <- "stock_ret_vs_bm_ret"
 relative_return |> 
@@ -491,9 +525,9 @@ The answer to the question of how much to hold in "defensive" assets is the same
 ::: {.callout-note appearance="minimal"}
 The author is the former CEO of OppenheimerFunds and a member of the Denison University Investment Committee. He can be reached at apsteinmetz\@gmail.com.
 
-
-This document is a Quarto notebook using the R data science language. Code and data available at [https://github.com/apsteinmetz/doc_always_invested.git](https://github.com/apsteinmetz/doc_always_invested.git). Quarto is available from [Posit.co](posit.co)
+This document is a Quarto notebook using the R data science language. Code and data available at <https://github.com/apsteinmetz/doc_always_invested.git>. Quarto is available from [Posit.co](posit.co)
 :::
+
 ## Appendix
 
 ### A Risk Parity Portfolio
@@ -501,26 +535,26 @@ This document is a Quarto notebook using the R data science language. Code and d
 Below we see the efficient frontier using the entire history for various mixes of stocks and bonds. Given cash returns, the "optimal" portfolio would have been a mix of about 40% stocks, 60% bonds. A risk parity portfolio to match even the volatility of a 70/30 portfolio would require an enormous amount of leverage. This is due to the sad fact that 10-year T-Notes have scarcely returned above short term T-Bills over the full history.
 
 ```{r compute capital market line}
-get_risk_return <- function(stock_alloc,returns,pds=4){
+get_risk_return <- function(stock_alloc,returns,pds=1){
    dt <- returns|> 
       mutate(mix_ret = stock_ret*stock_alloc + 
                 bond_ret * (1-stock_alloc)) |> 
       summarise(avg = mean(mix_ret),vol = sd(mix_ret)) |> 
       # annualize
-      mutate(annl_ret = (1 + avg)^pds-1,vol = vol*2)
+      mutate(annl_ret = (1 + avg)^pds-1,vol = vol*sqrt(pds))
    return(tibble(stock_alloc,
                  Expected_Return = dt$annl_ret,
                  Volatility = dt$vol))
 }
-emf <- map(0:10/10,get_risk_return,returns_qtr)  |> 
+emf <- map(0:10/10,get_risk_return,returns_annl)  |> 
    bind_rows()
 
-rf <- prod(1+returns_qtr$cash_ret)^(4/nrow(returns_qtr))-1
+rf <- prod(1+returns_annl$cash_ret)^(1/nrow(returns_annl))-1
 
 emf|> 
    ggplot(aes(Volatility,Expected_Return)) + geom_path(linewidth = 1) + 
    geom_text(label = emf$stock_alloc,nudge_y = -.01) +
-   geom_abline(intercept =  rf,slope = .44,color="red")+
+   geom_abline(intercept =  rf,slope = .35,color="red")+
    # geom_abline(intercept =  rf,slope = .40,color="blue")+
    scale_y_continuous(labels = scales::percent,limits = c(.0,.15)) +
    scale_x_continuous(labels = scales::percent,limits = c(0,.2)) + 
@@ -538,7 +572,7 @@ emf|>
 As noted earlier, we use a longer history than a typical analysis of this type. Often they confine their history to the "post-war" period or shorter. This makes our results more conservative because poor stock and bond markets were slightly more common earlier and volatility was higher. Below we can see that the distribution of outcomes for stocks shifts to the right (better) after 1946.
 
 ```{r summarize long history}
-returns_qtr |> 
+returns_annl |> 
    mutate(Period = ifelse(year(date) > 1946,"Since 1946","Before 1946")) |> 
    ggplot(aes(stock_ret,color=Period)) + geom_density(linewidth = 1) + 
    scale_color_tq() + 
@@ -554,7 +588,7 @@ returns_qtr |>
 If we filter out the wild gyrations around "The"Crash" from 1929 to 1933, the results do not change.
 
 ```{r filter out crash}
-returns_qtr |> 
+returns_annl |> 
    filter(!(year(date) %in% 1929:1933)) |> 
    mutate(Period = ifelse(year(date) > 1946,"Since 1946","Before 1946")) |> 
    ggplot(aes(stock_ret,color=Period)) + geom_density(linewidth = 1) + 

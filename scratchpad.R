@@ -1,61 +1,57 @@
-library(tidyverse)
-source("setup.r")
-constant_draw = TRUE
-annl_draw = -.04
-years=10
-base_value=100
-use_empirical = FALSE
-pds <- years * 4
-cash_flow <- c(100,rep(c(0,0,annl_draw*100,0),years))
-
-z <- returns_qtr |> select(cash_ret,bond_ret,stock_ret,cpi_growth) |>
-      na.omit() |>
-      sample_n(pds,replace = FALSE)
-   # prepend initial values
-z <- rbind(0,z)
-
-   # pick an historical path
-z <- returns_qtr |>
-      filter(year(date)>1972) |>
-      select(date,cash_ret,bond_ret,stock_ret,cpi_growth) |>
-      slice_head(n=pds+1) |>
-      # set first period to zero as base
-      mutate(across(2:5,\(x) x = ifelse(date == min(date),0,x)))
-
-zt <- cbind(z,cash_flow)|>
-      as_tibble() |>
-      # make 70/30 benchmark
-      mutate(bm_ret = stock_ret*.7 + bond_ret * .3,.before = "cpi_growth") |>
-      # adjust for inflation
-      mutate(cpi_index = cumprod(1 + cpi_growth)) |>
-      mutate(cash_flow = cash_flow * ifelse(constant_draw,cpi_index,1)) |>
-      mutate(cum_cash_flow = cumsum(cash_flow)-base_value) |>
-      # build quarterly account balances
-      mutate(across(cash_ret:bm_ret,\(x) get_balance(x,cash_flow,pds+1,constant_draw,annl_draw))) |>
-      #mutate(across(cash_ret:bm_ret,\(x) CB_R(x,cash_flow,pds+1,constant_draw,annl_draw))) |>
-      rename_with(.fn= \(x) str_replace(x,"ret","balance")) |>
-      select(contains("balance"))
+get_rolling_rel_performance <-
+   function(returns,
+            years = 10,
+            title = "Rolling 10-Year Return",
+            pds_per_year = 4) {
+      returns |>
+         mutate(across(where(is.numeric),
+                       function(x)
+                          (slide_prod(1 + x, before = years * pds_per_year - 1, complete = TRUE) ^ (1/10)) - 1)
+         ) |>
+         mutate(stock_advantage = stock_ret - bond_ret) |>
+         mutate(Advantage = ifelse(stock_advantage > 0,"Stocks Better","Bonds Better")) |>
+         na.omit()
+   }
 
 
-# plot in the style of Grant's Interest Rate Observer
-bind_cols(z[,1],zt) |>
-   ggplot(aes(date,stock_balance)) +
-   geom_line() +
-   geom_line(aes(date,bm_balance),linetype=2) +
-   geom_hline(yintercept = 100) +
-   annotate("text",family = "serif",label = "Starting Value: $100mm",
-            x=as.yearqtr("1975 Q1","%Y Q%q"), y= 102) +
-   labs(title= "How Patient Are You?",
-        subtitle = "$100mm Starting Endowment Value. Assume Fixed Annual Spend
-        Starting at $5mm, Growing With Inflation.",
-        y = "Endowment Balance ($mm)",
-        x= "Date",
-        caption="Source: Equity Returns - Robert Shiller; Simulation - Art Steinmetz") +
-   theme_light(base_family = "serif",base_size = 16) +
-   theme(plot.subtitle = element_text(vjust=-15,hjust=.1),
-         plot.title = element_text(vjust=-10)) +
-   annotate("text",x=3100,y=65, family = "serif",size = 5,
-            label = "100% U.S. Equities") +
-   annotate("text",x=3100,y=95, family = "serif",size = 5,
-            label = "70/30 Benchmark") +
-   scale_x_yearquarter(date_breaks = "year")
+pad <- tibble(date = yearquarter(seq(as.yearqtr("1802 Q1"), as.yearqtr("1870 Q4"), by=1/4)))
+
+relperf <- returns_qtr |>
+   select(date,stock_ret,bond_ret) |>
+   get_rolling_rel_performance(years = 10) |>
+   full_join(pad) |>
+   arrange(date) |>
+   #change all numeric NA to zero
+   mutate(across(where(is.numeric), ~replace_na(.,0))) |>
+   mutate(Advantage = replace_na(Advantage,"Stocks Better"))
+
+relperf |>
+   ggplot(aes(date, stock_advantage, fill = Advantage)) + geom_col() +
+   geom_hline(yintercept = 0) +
+   scale_color_tq() +
+   # show negative values in red
+   scale_fill_manual(values = c("orangered1", "skyblue3")) +
+   scale_x_yearquarter(breaks = "10 years", date_labels = "%Y") +
+   scale_y_continuous(labels = scales::percent) +
+   # increase size of x labels
+   theme_tq() +
+   theme(axis.text.x = element_text(size = 10)) +
+   labs(title = "Stocks minus Bonds over 10-Year Holding Periods",
+        x = "Date", y = "Annualized Return Difference")
+
+
+
+[1] "aliceblue"       "blue"            "blue1"           "blue2"           "blue3"           "blue4"           "blueviolet"      "cadetblue"
+[9] "cadetblue1"      "cadetblue2"      "cadetblue3"      "cadetblue4"      "cornflowerblue"  "darkblue"        "darkslateblue"   "deepskyblue"
+[17] "deepskyblue1"    "deepskyblue2"    "deepskyblue3"    "deepskyblue4"    "dodgerblue"      "dodgerblue1"     "dodgerblue2"     "dodgerblue3"
+[25] "dodgerblue4"     "lightblue"       "lightblue1"      "lightblue2"      "lightblue3"      "lightblue4"      "lightskyblue"    "lightskyblue1"
+[33] "lightskyblue2"   "lightskyblue3"   "lightskyblue4"   "lightslateblue"  "lightsteelblue"  "lightsteelblue1" "lightsteelblue2" "lightsteelblue3"
+[41] "lightsteelblue4" "mediumblue"      "mediumslateblue" "midnightblue"    "navyblue"        "powderblue"      "royalblue"       "royalblue1"
+[49] "royalblue2"      "royalblue3"      "royalblue4"      "skyblue"         "skyblue1"        "skyblue2"        "skyblue3"        "skyblue4"
+[57] "slateblue"       "slateblue1"      "slateblue2"      "slateblue3"      "slateblue4"      "steelblue"       "steelblue1"      "steelblue2"
+[65] "steelblue3"      "steelblue4"
+[1] "darkred"         "indianred"       "indianred1"      "indianred2"      "indianred3"      "indianred4"      "mediumvioletred" "orangered"
+[9] "orangered1"      "orangered2"      "orangered3"      "orangered4"      "palevioletred"   "palevioletred1"  "palevioletred2"  "palevioletred3"
+[17] "palevioletred4"  "red"             "red1"            "red2"            "red3"            "red4"            "violetred"       "violetred1"
+[25] "violetred2"      "violetred3"      "violetred4"
+>

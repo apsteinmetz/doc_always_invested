@@ -54,7 +54,7 @@ rolling_ret <- function(returns, years = 10,pds_per_year = 4) {
 
 
 get_return_struct <- function(returns){
-   obs <-as.matrix(na.omit(select(returns,cash_ret,bond_ret,stock_ret,cpi_growth)))
+   obs <-as.matrix(na.omit(select(returns,cash_ret,bond_ret,stock_ret,cpi_annl)))
    means <- colMeans(obs)
    std_dev <- apply(obs,2,sd)
    cov_mat <- cov(obs)
