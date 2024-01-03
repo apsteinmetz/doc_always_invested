@@ -66,8 +66,7 @@ This discussion paper examines perspectives on time diversification with the goa
 
 [^1]: The author is grateful to Anders Hall of Vanderbilt University and Krishna Memani of Lafayette College for their comments on a draft of this paper. All opinions and errors are the author's alone.
 
-This version of the paper uses the extended historical return record dataset developed by McQuarrie[@doi:10.1080/0015198X.2023.2268556]. This dataset shows worse relative returns for stocks in th 19th century than the more commonly used Shiller dataset. In an earlier version of this paper using 10-year returns going back to 1880, an all-stock portfolio outperforms a benchmark of 70% stocks/30% bonds 81% of the time. Using a history going back to 1802, stocks outperform a 70/30 portfolio only 64% of the time. Is the 19th century representative of the return distribution we expect going forward? That question is unanswered.
-
+This version of the paper uses the extended historical return record dataset developed by McQuarrie[@McQuarrie2023]. This dataset shows worse relative returns for stocks in th 19th century than the more commonly used Shiller dataset. In an earlier version of this paper using 10-year returns going back to 1880, an all-stock portfolio outperforms a benchmark of 70% stocks/30% bonds 81% of the time. Using a history going back to 1802, stocks outperform a 70/30 portfolio only 64% of the time. Is the 19th century representative of the return distribution we expect going forward? That question is unanswered.
 
 ## Introduction
 

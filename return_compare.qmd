@@ -1,0 +1,92 @@
+---
+title: "compare_ret_series"
+editor: visual
+---
+
+Load and clean data.
+
+```{r}
+library(tidyverse)
+library(gt)
+#load shiller long term returns
+load(file="data/shiller.rdata")
+returns_shiller <- shiller |>
+   mutate(year = year(date)) |> 
+   select(year,stock_ret,bond_ret) |>
+   group_by(year) |>
+   summarise(stock_ret = prod(1 + stock_ret) - 1,
+             bond_ret = prod(1 + bond_ret) - 1) |> 
+   mutate(source = "Shiller")|> 
+   pivot_longer(cols = contains("_ret"),names_to = "asset",values_to = "ret")
+
+
+# load McQuarrie long term returns
+returns_mcquarrie <- read_table("data/mcquarrie_new_series_1793_to_1925.csv") |> 
+   mutate(year = date) |> 
+   # mutate(date = as.Date(paste0(date,"-12-01"))) |> 
+   select(year,stock_ret,bond_ret) |> 
+   mutate(across(contains("_ret"),~parse_number(.)/100)) |> 
+   mutate(source = "McQuarrie") |> 
+   pivot_longer(cols = contains("_ret"),names_to = "asset",values_to = "ret")
+
+# append shiller post 1925 to mcquarrie
+returns_mcquarrie <- returns_shiller |>
+   filter(year > 1925) |>
+   bind_rows(returns_mcquarrie) |> 
+   arrange(year) |> 
+   mutate(source = "McQuarrie")
+
+
+returns <- bind_rows(returns_mcquarrie,returns_shiller)
+```
+
+
+Compare the two series return distributions
+
+```{r}
+returns |>
+   # filter(year >= 1870) |>
+   ggplot(aes(ret,color = source)) +
+   facet_wrap(vars(asset),scales="free") +
+   geom_density() + 
+   theme_minimal()
+```
+
+Summarise the data
+
+
+```{r}
+start_year = 1871
+end_year = 2023
+returns |>
+   filter(year >= start_year & year <= end_year) |>
+   group_by(asset, source) |>
+   summarise(
+      mean = mean(ret),
+      median = median(ret),
+      vol = sd(ret),
+      n = n()
+   ) |>
+   gt() |>
+   tab_header(title = "Annual Returns for Common History",
+              subtitle = glue::glue("{start_year} to {end_year}")) |>
+   fmt_percent(columns = c(mean,median,vol))
+```
+
+```{r}
+start_year = 1793
+end_year = 2023
+returns |>
+   filter(year >= start_year & year <= end_year) |>
+   group_by(asset, source) |>
+   summarise(
+      mean = mean(ret),
+      median = median(ret),
+      vol = sd(ret),
+      n = n()
+   ) |>
+   gt() |>
+   tab_header(title = "Annual Returns for Full Histories",
+              subtitle = glue::glue("{start_year}(McQuarrie) or 1870(Shiller) to {end_year}")) |>
+   fmt_percent(columns = c(mean,median,vol))
+```

@@ -21,7 +21,7 @@ returns <- shiller |>
 # convert monthly to quarterly returns
 # Create US passive BM going wayyy back
 returns_qtr <- returns |>
-   mutate(bm_ret = 0.7*stock_ret + 0.3*bond_ret,) |>
+   mutate(bm_ret = 0.7*stock_ret + 0.3*bond_ret) |>
    # 12-month change, monthly
    mutate(cpi_growth = (CPI/lag(CPI,12))^(1/12)-1) |>
    mutate(qtr = yearquarter(date)) |>
